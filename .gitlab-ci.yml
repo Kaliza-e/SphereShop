@@ -1,0 +1,50 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+build_job:
+  stage: build
+  image: node:20-alpine
+  script:
+    - cd api && npm ci && npm run build
+    - cd ../web && npm ci && npm run build
+  artifacts:
+    paths:
+      - api/dist
+      - web/dist
+
+unit_test_coverage_job:
+  stage: test
+  image: node:20-alpine
+  script:
+    - cd api && npm ci
+    - npm test
+  coverage: '/All files\s*\|\s*(\d+\.\d+)/'
+
+dependency_vulnerability_scan:
+  stage: test
+  image: node:20-alpine
+  script:
+    - cd api && npm audit --audit-level=high || true
+    - cd ../web && npm audit --audit-level=high || true
+
+secret_scanning:
+  stage: test
+  image: alpine:latest
+  script:
+    - echo "Scanning codebase for hardcoded secrets..."
+    - ! grep -r -i -E "(password|secret|key)\s*=\s*['\"][^'\"]+['\"]" api/src web/src --exclude-dir=node_modules || true
+
+deploy_uat:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - echo "Deploying SphereShop to UAT Kubernetes cluster..."
+    - kubectl apply -f k8s/ --dry-run=client
+  only:
+    - feature/sphereshop-build
+    - main

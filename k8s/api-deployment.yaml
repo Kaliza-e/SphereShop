@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sphereshop-api
+  namespace: sphereshop
+  labels:
+    app: sphereshop-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sphereshop-api
+  template:
+    metadata:
+      labels:
+        app: sphereshop-api
+    spec:
+      containers:
+        - name: api
+          image: sphereshop-api:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: sphereshop-config
+            - secretRef:
+                name: sphereshop-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sphereshop-api
+  namespace: sphereshop
+spec:
+  selector:
+    app: sphereshop-api
+  ports:
+    - port: 3000
+      targetPort: 3000
