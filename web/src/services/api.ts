@@ -1,8 +1,10 @@
 const API_BASE = "/api/v1";
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers as Record<string, string> || {})
   };
 
@@ -23,14 +25,26 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   }
 
   let data;
-  try {
-    data = await res.json();
-  } catch {
-    data = null;
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+  } else {
+    try {
+      data = await res.text();
+    } catch {
+      data = null;
+    }
   }
 
   if (!res.ok) {
-    const errorMsg = data?.error?.message || `Request failed with status ${res.status}`;
+    const errorMsg =
+      (typeof data === "object" && data?.error?.message) ||
+      (typeof data === "object" && data?.message) ||
+      `Request failed with status ${res.status}`;
     const err: any = new Error(errorMsg);
     err.status = res.status;
     err.data = data;
@@ -38,9 +52,4 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   }
 
   return data;
-}
-
-export function formatRWF(amount: number): string {
-  const rounded = Math.floor(amount || 0);
-  return `${rounded.toLocaleString()} RWF`;
 }

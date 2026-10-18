@@ -1,0 +1,21 @@
+{
+  "name": "sphereshop-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SphereShop — Containerized E-Commerce & Service-Booking Platform for Cloud Sphere Solutions, Kigali, Rwanda",
+  "scripts": {
+    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm --prefix api run dev\" \"npm --prefix web run dev\"",
+    "start": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm --prefix api run dev\" \"npm --prefix web run dev\"",
+    "dev:api": "npm --prefix api run dev",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "build:api": "npm --prefix api run build",
+    "build:web": "npm --prefix web run build",
+    "test": "npm --prefix api run test:unit && npm --prefix web run test",
+    "test:api": "npm --prefix api run test:unit",
+    "test:web": "npm --prefix web run test"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

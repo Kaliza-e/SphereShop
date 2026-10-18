@@ -5,15 +5,35 @@ SphereShop is a production-grade e-commerce storefront, REST API, and service-bo
 
 ---
 
-## Quick Start (One Command Local Launch)
+## Quick Start
+
+### 1. Local Full-Stack Development (Single Command)
+Run both the Backend API and Frontend Storefront together with live reload and color-coded logs:
+
+```bash
+# From the project root (cloudsphere)
+npm run dev
+```
+
+This starts:
+- **Web Storefront**: [http://localhost:5173](http://localhost:5173)
+- **REST API & Health Check**: [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products) | [http://localhost:3001/health](http://localhost:3001/health)
+
+*(Optional: Run them in separate terminals)*:
+- **Backend API**: `cd api && npm run dev` (Port 3001)
+- **Frontend Web**: `cd web && npm run dev` (Port 5173)
+
+---
+
+### 2. Docker Compose (Full Stack with Observability)
 
 ```bash
 docker compose up -d
 ```
 
-Access services locally:
+Access services:
 - **Web Storefront**: `http://localhost/`
-- **REST API & Health Check**: `http://localhost:3000/api/v1/products` | `http://localhost:3000/health`
+- **REST API**: `http://localhost:3000/api/v1/products` | `http://localhost:3000/health`
 - **Prometheus Metrics**: `http://localhost:3000/metrics` | `http://localhost:9090`
 - **Grafana Dashboards**: `http://localhost:3001` (login: `admin` / `admin`)
 
