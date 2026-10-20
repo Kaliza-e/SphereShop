@@ -27,8 +27,9 @@ function getNextOrderNumber(): string {
 
 // GET /checkout/quote
 router.get("/checkout/quote", (req: AuthenticatedRequest, res: Response) => {
-  const { method = "STANDARD", district } = req.query;
-  const deliveryMethod = (method as string).toUpperCase() as "STANDARD" | "EXPRESS" | "PICKUP";
+  const rawMethod = (req.query.method || req.query.deliveryMethod || "STANDARD") as string;
+  const district = req.query.district;
+  const deliveryMethod = rawMethod.toUpperCase() as "STANDARD" | "EXPRESS" | "PICKUP";
 
   if (deliveryMethod !== "PICKUP" && district) {
     if (!isAllowedDistrict(district as string)) {
@@ -277,7 +278,8 @@ router.post("/orders", requireAuth, async (req: AuthenticatedRequest, res: Respo
     status: "PENDING_PAYMENT",
     total: pricing.total,
     providerRef: chargeRes.providerRef,
-    message: "Order placed. Awaiting payment confirmation."
+    message: "Order placed. Awaiting payment confirmation.",
+    order: newOrder
   };
 
   idempotencyMap.set(idempotencyKey, resultPayload);

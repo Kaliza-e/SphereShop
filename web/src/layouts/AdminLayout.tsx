@@ -26,7 +26,7 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="app-shell" style={{ background: "#F1F5F9" }}>
+    <div className="app-shell admin-shell" style={{ background: "#F1F5F9" }}>
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
         <div

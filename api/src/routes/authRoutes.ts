@@ -119,14 +119,17 @@ router.post("/register", async (req: AuthenticatedRequest, res: Response) => {
 
 // POST /auth/login
 router.post("/login", async (req: AuthenticatedRequest, res: Response) => {
-  const { login, password } = req.body;
+  const loginInput = req.body.login || req.body.identifier;
+  const { password } = req.body;
   const genericError = { error: { code: "INVALID_CREDENTIALS", message: "Phone/e-mail or password is incorrect" } };
 
-  if (!login || !password) {
+  if (!loginInput || !password) {
     return res.status(401).json(genericError);
   }
 
-  const user = Array.from(memoryDb.users.values()).find(u => u.phone === login.trim() || u.email === login.trim().toLowerCase());
+  const user = Array.from(memoryDb.users.values()).find(
+    u => u.phone === loginInput.trim() || u.email === loginInput.trim().toLowerCase()
+  );
   if (!user) {
     return res.status(401).json(genericError);
   }

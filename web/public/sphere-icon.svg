@@ -1,0 +1,29 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="sphereBaseGrad" cx="35%" cy="65%" r="65%">
+      <stop offset="0%" stop-color="#3B62F6" />
+      <stop offset="60%" stop-color="#2D54EE" />
+      <stop offset="100%" stop-color="#1E40D6" />
+    </radialGradient>
+    <linearGradient id="sphereTopGrad" x1="20%" y1="0%" x2="80%" y2="80%">
+      <stop offset="0%" stop-color="#9CB5FD" />
+      <stop offset="100%" stop-color="#7397FA" />
+    </linearGradient>
+    <clipPath id="sphereClip">
+      <circle cx="32" cy="32" r="30" />
+    </clipPath>
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#2563EB" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <g filter="url(#softGlow)">
+    <g clip-path="url(#sphereClip)">
+      <!-- Base deep sphere -->
+      <circle cx="32" cy="32" r="30" fill="url(#sphereBaseGrad)" />
+      <!-- Upper crescent highlight with smooth curvature -->
+      <path d="M 2 26 C 14 38, 38 42, 62 26 L 62 2 L 2 2 Z" fill="url(#sphereTopGrad)" />
+      <!-- Subtle edge rim reflection -->
+      <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
+    </g>
+  </g>
+</svg>

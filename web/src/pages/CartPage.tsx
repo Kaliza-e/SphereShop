@@ -56,7 +56,7 @@ export function CartPage() {
   if (!cart || cart.lines?.length === 0) {
     return (
       <div className="card" style={{ textAlign: "center", padding: "64px 24px", maxWidth: "600px", margin: "40px auto" }}>
-        <div style={{ width: "80px", height: "80px", borderRadius: "999px", background: "var(--cs-orange-50)", color: "var(--cs-orange-500)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px auto" }}>
+        <div style={{ width: "80px", height: "80px", borderRadius: "999px", background: "var(--cs-blue-50)", color: "var(--cs-blue-600)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px auto" }}>
           <ShoppingBag size={40} />
         </div>
         <h2 style={{ fontSize: "1.6rem", fontWeight: 800, marginBottom: "8px" }}>Your Shopping Cart is Empty</h2>

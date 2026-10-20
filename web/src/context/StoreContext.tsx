@@ -121,7 +121,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const login = async (identifier: string, password: string): Promise<User> => {
     const data = await apiRequest("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ identifier, password }),
+      body: JSON.stringify({ login: identifier, identifier, password }),
     });
     setUser(data.user);
     showToast(`Welcome back, ${data.user.name}!`, "success");

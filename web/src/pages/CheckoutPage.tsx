@@ -19,7 +19,7 @@ import { apiRequest } from "../services/api";
 import { formatRWF, KIGALI_DISTRICTS, KIGALI_PICKUP_POINTS } from "../data/productMedia";
 
 export function CheckoutPage() {
-  const { user, cart, refreshCart, showToast } = useStore();
+  const { user, cart, refreshCart, showToast, login } = useStore();
   const navigate = useNavigate();
 
   // Multi-step
@@ -75,7 +75,7 @@ export function CheckoutPage() {
   if (!cart || cart.lines?.length === 0) {
     return (
       <div className="card" style={{ textAlign: "center", padding: "64px 20px", maxWidth: "540px", margin: "40px auto" }}>
-        <ShoppingBag size={48} color="var(--cs-orange-500)" style={{ margin: "0 auto 16px" }} />
+        <ShoppingBag size={48} color="var(--cs-blue-600)" style={{ margin: "0 auto 16px" }} />
         <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "8px" }}>Your Cart is Empty</h2>
         <p style={{ color: "var(--cs-text-secondary)", marginBottom: "20px" }}>Add items to your cart before proceeding to checkout.</p>
         <Link to="/products" className="btn btn-primary">Browse Catalogue</Link>
@@ -86,8 +86,8 @@ export function CheckoutPage() {
   // If not signed in, show gate
   if (!user) {
     return (
-      <div className="card" style={{ maxWidth: "480px", margin: "40px auto", padding: "36px", textAlign: "center" }}>
-        <div style={{ width: "64px", height: "64px", borderRadius: "999px", background: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px auto" }}>
+      <div className="card" style={{ maxWidth: "500px", margin: "40px auto", padding: "36px", textAlign: "center" }}>
+        <div style={{ width: "64px", height: "64px", borderRadius: "999px", background: "#EFF6FF", color: "#3B5AF4", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px auto" }}>
           <Lock size={30} />
         </div>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "8px" }}>Sign In to Complete Order</h2>
@@ -101,6 +101,16 @@ export function CheckoutPage() {
           <Link to="/register?redirect=/checkout" className="btn btn-secondary btn-full" style={{ padding: "12px" }}>
             Create New Shopper Account
           </Link>
+          <button
+            type="button"
+            onClick={async () => {
+              await login("aline@spheretest.rw", "Kigali2026");
+            }}
+            className="btn btn-secondary btn-full"
+            style={{ padding: "10px", fontSize: "0.85rem", marginTop: "6px", background: "#F8FAFC" }}
+          >
+            ⚡ Quick 1-Click Demo Login (Aline - Shopper)
+          </button>
         </div>
       </div>
     );
@@ -139,23 +149,31 @@ export function CheckoutPage() {
         body: JSON.stringify(orderPayload)
       });
 
-      const placedOrder = res.order;
+      const placedOrderId = res.orderId || res.order?.id || res.id;
+      let orderObj = res.order;
 
-      // 2. Simulate payment confirmation (SRS: instant stub adapter via test-support or webhook)
-      try {
-        await apiRequest(`/orders/${placedOrder.id}/pay`, {
-          method: "POST",
-          body: JSON.stringify({ paymentProvider })
-        });
-      } catch (payErr) {
-        console.warn("Auto-pay trigger:", payErr);
+      // 2. Fetch latest order state
+      if (placedOrderId) {
+        try {
+          const finalOrderRes = await apiRequest(`/orders/${placedOrderId}`);
+          orderObj = finalOrderRes.order || finalOrderRes || orderObj;
+        } catch (fetchErr) {
+          console.warn("Fetch order state error:", fetchErr);
+        }
       }
 
-      // 3. Fetch latest order state
-      const finalOrderRes = await apiRequest(`/orders/${placedOrder.id}`);
-      setConfirmedOrder(finalOrderRes.order || placedOrder);
+      setConfirmedOrder(orderObj || {
+        id: placedOrderId,
+        order_number: res.orderNumber || `SS-${Date.now()}`,
+        status: "PENDING_PAYMENT",
+        total: res.total || 0,
+        delivery_method: deliveryMethod,
+        delivery_address: fullDeliveryAddress,
+        delivery_district: district,
+        created_at: new Date()
+      });
 
-      // 4. Refresh cart and advance to confirmation
+      // 3. Refresh cart and advance to confirmation
       await refreshCart();
       setStep(3);
       showToast("Order placed successfully! We've prepared your delivery.", "success");

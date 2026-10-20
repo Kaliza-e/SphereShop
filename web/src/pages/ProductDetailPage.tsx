@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
   Heart,
@@ -11,7 +11,8 @@ import {
   Plus,
   Minus,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from "lucide-react";
 import { Product } from "../types";
 import { apiRequest } from "../services/api";
@@ -22,6 +23,7 @@ import { ProductCard } from "../components/ProductCard";
 export function ProductDetailPage() {
   const { sku } = useParams<{ sku: string }>();
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -111,6 +113,17 @@ export function ProductDetailPage() {
     setAdding(true);
     try {
       await addToCart(product.sku, quantity);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (isOutOfStock || adding) return;
+    setAdding(true);
+    try {
+      await addToCart(product.sku, quantity);
+      navigate("/checkout");
     } finally {
       setAdding(false);
     }
@@ -247,18 +260,29 @@ export function ProductDetailPage() {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock || adding}
-              className="btn btn-primary"
-              style={{ flex: 1, minWidth: "200px", padding: "14px 24px", fontSize: "1rem" }}
+              className="btn btn-secondary"
+              style={{ flex: 1, minWidth: "160px", padding: "14px 20px", fontSize: "0.95rem" }}
               id="product-detail-add-to-cart"
             >
               <ShoppingBag size={18} />
-              <span>{isOutOfStock ? "Out of Stock" : adding ? "Adding to Cart..." : "Add to Cart"}</span>
+              <span>{isOutOfStock ? "Out of Stock" : adding ? "Adding..." : "Add to Cart"}</span>
+            </button>
+
+            <button
+              onClick={handleBuyNow}
+              disabled={isOutOfStock || adding}
+              className="btn btn-primary"
+              style={{ flex: 1.2, minWidth: "180px", padding: "14px 24px", fontSize: "1rem" }}
+              id="product-detail-buy-now"
+            >
+              <Zap size={18} />
+              <span>Buy Now</span>
             </button>
 
             <button
               onClick={() => toggleWishlist(product.sku)}
               className={`btn btn-secondary ${inWishlist ? "active" : ""}`}
-              style={{ padding: "14px 20px" }}
+              style={{ padding: "14px 18px" }}
               title="Add to Wishlist"
             >
               <Heart size={18} fill={inWishlist ? "var(--cs-rose-500)" : "none"} color={inWishlist ? "var(--cs-rose-500)" : "currentColor"} />

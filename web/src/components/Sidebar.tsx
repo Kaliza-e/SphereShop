@@ -12,6 +12,7 @@ import {
   Truck,
   HelpCircle,
   Menu,
+  X,
   Sparkles
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
@@ -65,12 +66,12 @@ export function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: Side
             />
           </Link>
           <button
-            onClick={handleHamburgerClick}
+            onClick={onClose}
             className="sidebar-hamburger-btn"
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            aria-label="Toggle Sidebar"
+            title="Close Menu"
+            aria-label="Close Navigation Drawer"
           >
-            <Menu size={20} />
+            <X size={20} />
           </button>
         </div>
 
